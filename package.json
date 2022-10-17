@@ -1,0 +1,22 @@
+{
+  "name": "threejs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@maptalks/gl": "^0.76.0",
+    "maptalks": "^1.0.0-rc.13",
+    "maptalks.three": "^0.27.1",
+    "three": "^0.138.0",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.0",
+    "vite": "^3.1.0"
+  }
+}
