@@ -128,7 +128,8 @@ function addExtrudePolygon(geojson) {
         case "mouseout":
           if (
             marker._markerCoord.x !== this.options.attributes.coordinates[0] &&
-            marker._markerCoord.y !== this.options.attributes.coordinates[1]
+            marker._markerCoord.y !== this.options.attributes.coordinates[1] &&
+            highlightIndex !== -1
           ) {
             this.setSymbol(material);
           }
@@ -138,10 +139,12 @@ function addExtrudePolygon(geojson) {
           this.setSymbol(highlightmaterial);
           break;
         case "click":
+          //单击前将所有polygon取消高亮
+          setExtrudepolygonsSymbol(material);
           //若当前存在高亮polygon 先将其取消高亮
-          if (highlightIndex != -1) {
-            extrudepolygons[highlightIndex].setSymbol(material);
-          }
+          // if (highlightIndex != -1) {
+          //   extrudepolygons[highlightIndex].setSymbol(material);
+          // }
           highlightIndex = extrudepolygons.indexOf(this) - 1;
           startTimer(5000);
       }
@@ -241,22 +244,40 @@ let marker = new maptalks.ui.UIMarker(
   }
 );
 
-let highlightIndex = -1; // 高亮索引 初始值为-1
+let highlightIndex = -2; // 高亮索引 初始值为-2,-1为四川省
 //按顺序mark所有城市
 function markCity() {
-  if (highlightIndex != -1) {
+  if (highlightIndex == -1) {
+    setExtrudepolygonsSymbol(material);
+  } else if (highlightIndex != -2) {
     extrudepolygons[highlightIndex].setSymbol(material);
   }
   highlightIndex++;
   //当mark到最后一个城市后 重头开始
   if (highlightIndex == extrudepolygons.length) {
-    highlightIndex = 0;
+    highlightIndex = -1;
   }
-  const currentPolygon = extrudepolygons[highlightIndex];
-  const currentCoords = currentPolygon.options.attributes.coordinates;
-  currentCoords &&
-    marker.setCoordinates(new maptalks.Coordinate(currentCoords));
-  currentPolygon.setSymbol(highlightmaterial);
+  if (highlightIndex == -1) {
+    // 省本级
+    setExtrudepolygonsSymbol(highlightmaterial); // 全部高亮
+    marker.setCoordinates(
+      new maptalks.Coordinate(103.929954216017393, 30.653427118792671)
+    );
+  } else {
+    // 市本级
+    const currentPolygon = extrudepolygons[highlightIndex];
+    const currentCoords = currentPolygon.options.attributes.coordinates;
+    currentCoords &&
+      marker.setCoordinates(new maptalks.Coordinate(currentCoords));
+    currentPolygon.setSymbol(highlightmaterial);
+  }
+}
+
+function setExtrudepolygonsSymbol(symbol) {
+  extrudepolygons &&
+    extrudepolygons.forEach((extrudepolygon) => {
+      extrudepolygon.setSymbol(symbol);
+    });
 }
 
 function startTimer(time) {
