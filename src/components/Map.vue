@@ -11,7 +11,7 @@ import sichuan from "./json/sichuan.json";
 import scPoint from "./json/sichuan_point.json";
 import scBorder from "./json/sichuan-border.json";
 import { createFlyCurve, timerFlyCurve } from "../flyCurve.js";
-
+import icon from "../assets/frames/ICON_target_0.png";
 const map = ref(null);
 onMounted(() => {
   // 初始化地图
@@ -231,15 +231,15 @@ function addPoints(points) {
 }
 
 let dom = document.createElement("div");
-dom.innerHTML = "";
-dom.className = "online";
+let img = document.createElement("img");
+dom.appendChild(img);
 //添加marker
 let marker = new maptalks.ui.UIMarker(
   [102.663822040699785, 29.912182469248506],
   {
     draggable: false,
     content: dom,
-    dy: -50,
+    dy: 0,
     altitude: 20000,
   }
 );
@@ -271,6 +271,8 @@ function markCity() {
       marker.setCoordinates(new maptalks.Coordinate(currentCoords));
     currentPolygon.setSymbol(highlightmaterial);
   }
+  currentIconIndex = 0;
+  currentIconScale = 1;
 }
 
 function setExtrudepolygonsSymbol(symbol) {
@@ -290,6 +292,31 @@ function clearTimer() {
   if (timer.value) clearInterval(timer.value);
   timer.value = null;
 }
+//图标动画
+const delay = 30;
+const imgCount = 60;
+let currentIconIndex = 0; //当前图片索引值
+let currentIconScale = 1; //当前图片缩放尺寸
+let animations = (i) => {
+  if (i === imgCount) {
+    currentIconIndex = 0;
+    animations(currentIconIndex);
+    return;
+  }
+  img.src = `/src/assets/frames/ICON_target_${i}.png`;
+  img.style.transform = `scale(${currentIconScale})`;
+  img.onload = () => {
+    setTimeout(() => {
+      currentIconIndex++;
+      //第一次点击时图片缩放效果，从1逐步缩小至0.5倍，然后再0.5倍循环播放
+      if (currentIconScale > 0.5) {
+        currentIconScale -= 0.02;
+      }
+      animations(currentIconIndex);
+    }, delay);
+  };
+};
+animations(currentIconIndex);
 </script>
 <style>
 html,
@@ -303,73 +330,5 @@ body {
   width: 100%;
   height: 100%;
   background-color: #000;
-}
-
-.online {
-  width: 186px;
-  height: 154px;
-  background: url(../assets/online-frames/online_01.png),
-    url(../assets/online-frames/online_02.png),
-    url(../assets/online-frames/online_03.png),
-    url(../assets/online-frames/online_04.png),
-    url(../assets/online-frames/online_05.png),
-    url(../assets/online-frames/online_06.png),
-    url(../assets/online-frames/online_07.png),
-    url(../assets/online-frames/online_08.png),
-    url(../assets/online-frames/online_09.png),
-    url(../assets/online-frames/online_10.png),
-    url(../assets/online-frames/online_11.png),
-    url(../assets/online-frames/online_12.png),
-    url(../assets/online-frames/online_13.png),
-    url(../assets/online-frames/online_14.png);
-  position: relative;
-  animation: onlineFrames 2.5s linear infinite;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-@keyframes onlineFrames {
-  0% {
-    background: url(../assets/online-frames/online_01.png) no-repeat;
-  }
-  8% {
-    background: url(../assets/online-frames/online_02.png) no-repeat;
-  }
-  15% {
-    background: url(../assets/online-frames/online_03.png) no-repeat;
-  }
-  23% {
-    background: url(../assets/online-frames/online_04.png) no-repeat;
-  }
-  31% {
-    background: url(../assets/online-frames/online_05.png) no-repeat;
-  }
-  38% {
-    background: url(../assets/online-frames/online_06.png) no-repeat;
-  }
-  46% {
-    background: url(../assets/online-frames/online_07.png) no-repeat;
-  }
-  54% {
-    background: url(../assets/online-frames/online_08.png) no-repeat;
-  }
-  62% {
-    background: url(../assets/online-frames/online_09.png) no-repeat;
-  }
-  69% {
-    background: url(../assets/online-frames/online_10.png) no-repeat;
-  }
-  77% {
-    background: url(../assets/online-frames/online_11.png) no-repeat;
-  }
-  84% {
-    background: url(../assets/online-frames/online_12.png) no-repeat;
-  }
-  92% {
-    background: url(../assets/online-frames/online_13.png) no-repeat;
-  }
-  100% {
-    background: url(../assets/online-frames/online_14.png) no-repeat;
-  }
 }
 </style>
